@@ -92,29 +92,14 @@ static func v4() -> String:
 static func v4bin() -> PackedByteArray:
 	var data: PackedByteArray
 
-	if OS.has_feature("web"):
-		# Fallback for HTML5 export
-		if OS.has_feature("JavaScript"):
-			# Rely checked browser's Crypto object if available
-			var output = JavaScriptBridge.eval("window.crypto.getRandomValues(new Uint8Array(16));")
-			if output is PackedByteArray and output.size() == 16:
-				data = output
-
-		if data == null:
-			# Generate weak random values
-			# ONLY when Crypto is not provided by the browser
-			var random = RandomNumberGenerator.new()
-			random.randomize()
-			data = PackedByteArray([
-				_randb(random), _randb(random), _randb(random), _randb(random),
-				_randb(random), _randb(random), _randb(random), _randb(random),
-				_randb(random), _randb(random), _randb(random), _randb(random),
-				_randb(random), _randb(random), _randb(random), _randb(random)
-			])
-
-	else:
-		# Use cryptographically secure bytes when available
-		data = Crypto.new().generate_random_bytes(16)
+	var random = RandomNumberGenerator.new()
+	random.randomize()
+	data = PackedByteArray([
+		_randb(random), _randb(random), _randb(random), _randb(random),
+		_randb(random), _randb(random), _randb(random), _randb(random),
+		_randb(random), _randb(random), _randb(random), _randb(random),
+		_randb(random), _randb(random), _randb(random), _randb(random)
+	])
 
 	data[6] = (data[6] & 0x0f) | 0x40
 	data[8] = (data[8] & 0x3f) | 0x80
